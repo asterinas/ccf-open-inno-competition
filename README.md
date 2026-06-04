@@ -103,8 +103,8 @@
 
 ## 五、识别和修复 Bug
 
-* **修复 gvisor 测试集中目前[被 blocked](https://github.com/asterinas/asterinas/tree/main/test/initramfs/src/syscall/gvisor/blocklists) 的测试用例** — 共 59 个 blocklist 文件、673 个测试用例被 block，涵盖文件操作、socket、信号、内存映射等多个子系统 【低-高】（视具体测试而定）
-* **修复 LTP 测试集中目前[被 blocked](https://github.com/asterinas/asterinas/blob/main/test/initramfs/src/syscall/ltp/testcases/) 的测试用例** — 其中 ext2 有 55 个、exFAT 有 98 个测试被 block 【低-高】（视具体测试而定）
+* **修复 gVisor 测试集中目前[被 blocked](https://github.com/asterinas/asterinas/tree/main/test/initramfs/src/conformance/gvisor/blocklists) 的测试用例** — 相关 blocklist 涵盖文件操作、socket、信号、内存映射等多个子系统，具体数量以主仓库当前目录为准 【低-高】（视具体测试而定）
+* **修复 LTP 测试集中目前[被 blocked](https://github.com/asterinas/asterinas/tree/main/test/initramfs/src/conformance/ltp/testcases/blocked) 的测试用例** — ext2、exFAT 等文件系统相关 blocked 用例以主仓库当前 blocklist 为准 【低-高】（视具体测试而定）
 
 ## 六、测试与基础设施
 
