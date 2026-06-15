@@ -6,12 +6,12 @@
 
 ## 一、增加内核子系统
 
-* **增加 Linux Security Module (LSM) 子系统，增加 YAMA** — 目前内核缺少 LSM 框架，`ptrace` 访问检查处有明确的 TODO 提到需要 YAMA（`kernel/src/process/posix_thread/alien_access.rs:57`）【高】
+* ~~**增加 Linux Security Module (LSM) 子系统，增加 YAMA** — 目前内核缺少 LSM 框架，`ptrace` 访问检查处有明确的 TODO 提到需要 YAMA（`kernel/src/process/posix_thread/alien_access.rs:57`）【高】~~
 * **增加 device mapper 子系统，并增加 dm-crypt、dm-verity 等安全虚拟存储** 【高】
 * **增加 seccomp 子系统** — 目前完全没有 seccomp 实现，这是容器安全的关键组件 【高】
 * **增加 io_uring 异步 I/O 子系统** — 目前缺少 `io_uring_setup`、`io_uring_enter`、`io_uring_register` 等系统调用，这是现代 Linux 高性能 I/O 的核心 【中】
 * **增加 Network namespace** — 目前网络命名空间未实现，是容器网络隔离所必需的 【中】
-* **增加 IPC namespace 和 Cgroup namespace** — 在 nsproxy 中标记为 TODO（`kernel/src/process/namespace/nsproxy.rs:76`）【中】
+* ~~**增加 IPC namespace 和 Cgroup namespace** — 在 nsproxy 中标记为 TODO（`kernel/src/process/namespace/nsproxy.rs:76`）【中】~~
 * **增加 coredump 支持** — 目前 `PR_GET_DUMPABLE` 始终返回 DISABLE，`PR_SET_DUMPABLE` 为空操作（`kernel/src/syscall/prctl.rs:38-46`）【中】
 
 ## 二、增加硬件支持和设备驱动
@@ -28,12 +28,12 @@
 
 ### 文件系统
 
-* **完善 procfs，增加缺失的 inodes** — 如 `/proc/meminfo`（[Issue #946](https://github.com/asterinas/asterinas/issues/946)）、`/proc/<tid>` 线程信息（[Issue #2940](https://github.com/asterinas/asterinas/issues/2940)），以及 `/proc/[pid]/status` 和 `/proc/[pid]/stat` 中标记为 FIXME 的未实现字段（`kernel/src/fs/fs_impls/procfs/pid/task/status.rs:22`、`stat.rs:24`）【高】
+* **完善 procfs，增加缺失的 inodes** — 如 ~~`/proc/meminfo`（[Issue #946](https://github.com/asterinas/asterinas/issues/946)）~~、~~`/proc/<tid>` 线程信息（[Issue #2940](https://github.com/asterinas/asterinas/issues/2940)）~~，以及 `/proc/[pid]/status` 和 ~~`/proc/[pid]/stat`~~ 中标记为 FIXME 的未实现字段（`kernel/src/fs/fs_impls/procfs/pid/task/status.rs:22`、`stat.rs:24`）【高】
 * **增加 devtmpfs** — 在 `/dev` 下实现内核管理的 tmpfs，替代当前临时方案（[Issue #1990](https://github.com/asterinas/asterinas/issues/1990)）【高】
 * **增加 ext4 文件系统支持** — 目前只有 ext2，缺少现代 Linux 最常用的 ext4 【高】
 * **完善 VFS 路径解析中的负 dentry 缓存** — 当前标记为 TODO，负 dentry 膨胀是性能问题（`kernel/src/fs/vfs/path/dentry.rs:295,573`）【中】
 * **实现 mount propagation（shared/private/slave/unbindable）** — 目前仅实现了 private 传播类型（`kernel/src/fs/vfs/path/mount.rs:35`）【中-高】
-* **增加 `O_TMPFILE` 标志支持** — 当前明确标记为 TODO（`kernel/src/fs/file/file_attr/creation_flags.rs:6`）【低】
+* ~~**增加 `O_TMPFILE` 标志支持** — 当前明确标记为 TODO（`kernel/src/fs/file/file_attr/creation_flags.rs:6`）【低】~~
 
 ### 网络
 
@@ -43,10 +43,12 @@
 * **完善 Unix domain socket** — 控制消息（SCM_RIGHTS、SCM_CREDENTIALS）实现不完整（`kernel/src/net/socket/unix/ctrl_msg.rs` 中有多处 TODO）、SEQPACKET 类型缺失 【中】
 * **支持多网卡和路由表** — 当前硬编码单个网络设备，FIXME 提到应从路由表获取广播信息（`kernel/src/net/iface/init.rs:33`、`broadcast.rs:11`）【中-高】
 * **完善 Netlink route 内核实现** — 当前有 TODO 指出应为 per-namespace socket（`kernel/src/net/socket/netlink/route/kernel/mod.rs:73`）、ACK 标志处理未完成（`:50`）【中】
+* **支持 IP raw socket** — 当前尚未支持 IP raw socket，`ping` 等用户态程序会依赖该能力；可参考此前未完成的实现（[PR #1660](https://github.com/asterinas/asterinas/pull/1660)）【高】
+* **支持绑定到 `INADDR_ANY`** — 当前仅能绑定到特定网络设备，尚不支持绑定到`INADDR_ANY`（`0.0.0.0`）以监听所有网卡，这是很多服务器应用程序需要的能力（[Issue #264](https://github.com/asterinas/asterinas/issues/264)）【高】
 
 ### 进程与调度
 
-* **完善 capability 检查机制** — 重新设计 capability 检查 API（[Issue #2381](https://github.com/asterinas/asterinas/issues/2381)），支持 bounding 和 ambient capability set（`kernel/src/process/credentials/mod.rs:32`）【中】
+* **完善 capability 检查机制** — ~~重新设计 capability 检查 API（[Issue #2381](https://github.com/asterinas/asterinas/issues/2381)）~~，支持 ~~bounding~~ 和 ambient capability set（`kernel/src/process/credentials/mod.rs:32`）【中】
 * **完善 futex 实现** — 当前缺少 `FUTEX_WAKE_OP` 操作，robust futex 支持也有待完善（`kernel/src/process/posix_thread/futex.rs` 多处 FIXME）【中】
 * **完善 rlimit 资源限制执行** — 多数 RLIMIT_* 常量未实际执行限制检查（[Issue #2841](https://github.com/asterinas/asterinas/issues/2841)），含约 16 个子任务 【低-中】（每个子任务）
 * **增加 `SCHED_DEADLINE` 调度策略** — 目前实现了 CFS、FIFO、RR，但缺少 DEADLINE 和 BATCH 策略 【中-高】
@@ -66,11 +68,11 @@
 * **完善 `mremap` 系统调用** — 当前有 FIXME 和 TODO（`kernel/src/syscall/mremap.rs:81,94`）【中】
 * **支持 `MAP_32BIT` mmap 标志** — 当前标记为 TODO（`kernel/src/syscall/mmap.rs:89`）【低-中】
 * **完善 `setns` 系统调用** — 多处 TODO 表明命名空间切换不完整（`kernel/src/syscall/setns.rs:95,128,172,201`）【中】
-* **实现 Go 标准库所需的全部系统调用** — 有详细追踪 Issue（[Issue #1888](https://github.com/asterinas/asterinas/issues/1888)），含优先级和复杂度评级，可逐个完成 【中】
+* ~~**实现 Go 标准库所需的全部系统调用** — 有详细追踪 Issue（[Issue #1888](https://github.com/asterinas/asterinas/issues/1888)），含优先级和复杂度评级，可逐个完成 【中】~~
 
 ### 设备与终端
 
-* **支持多 TTY 终端** — 实现 Ctrl+Alt+Fn 虚拟终端切换（[Issue #2820](https://github.com/asterinas/asterinas/issues/2820)）【中】
+* ~~**支持多 TTY 终端** — 实现 Ctrl+Alt+Fn 虚拟终端切换（[Issue #2820](https://github.com/asterinas/asterinas/issues/2820)）【中】~~
 * **完善 TTY line discipline** — 未实现输出标志处理（`kernel/src/device/tty/line_discipline.rs:160`），canonical 模式切换行为不正确（`:244`）【中】
 * **完善 evdev 事件设备** — 缺少设备节点删除功能（`kernel/src/device/evdev/mod.rs:284`），多个 ioctl 操作未实现（`evdev/file.rs`）【中】
 * **增加 /dev/random 真随机性支持** — 当前标记为 TODO，需要收集环境噪声（`kernel/src/device/mem/file.rs:42`）【中-高】
@@ -81,11 +83,11 @@
 * **让 frame allocator 回收 bootloader 内存区域** — 当前引导程序使用的内存未被回收（[Issue #322](https://github.com/asterinas/asterinas/issues/322)）【低】
 * **支持内核空间大页映射** — 当前标记为 TODO（`ostd/src/mm/kspace/mod.rs:261`）【中-高】
 * **实现 TLB ASID 管理** — 减少 TLB flush 次数，提升上下文切换性能（[Issue #969](https://github.com/asterinas/asterinas/issues/969)）【中-高】
-* **重构 page cache 系统** — 改进页面缓存架构（[Issue #2937](https://github.com/asterinas/asterinas/issues/2937)）【高】
+* ~~**重构 page cache 系统** — 改进页面缓存架构（[Issue #2937](https://github.com/asterinas/asterinas/issues/2937)）【高】~~
 
 ### Cgroup
 
-* **增加更多 cgroup controller** — 目前仅实现 Memory、CPUSet、PIDs 三个控制器（`kernel/src/fs/fs_impls/cgroupfs/controller/mod.rs`），缺少 CPU、Devices、Freezer、Blkio、Net_cls 等常用控制器 【中】（每个控制器）
+* **增加更多 cgroup controller** — 目前仅实现 Memory、CPUSet、PIDs 三个控制器（`kernel/src/fs/fs_impls/cgroupfs/controller/mod.rs`），缺少 ~~CPU~~、Devices、Freezer、Blkio、Net_cls 等常用控制器 【中】（每个控制器）
 
 ---
 
@@ -93,10 +95,10 @@
 
 * **实现可扩展的引用计数（scalable refcount）** — 类似 RadixVM 的 RefCache，提升多核下页面引用计数的可扩展性（[Issue #1529](https://github.com/asterinas/asterinas/issues/1529)）【高】
 * **实现队列自旋锁（queued spinlock）** — 类似 Linux 的 qspinlock，改善锁竞争下的性能（[Issue #1528](https://github.com/asterinas/asterinas/issues/1528)）【高】
-* **零原子操作的文件表查找** — 消除文件描述符表查找中的原子操作开销（[Issue #1550](https://github.com/asterinas/asterinas/issues/1550)）【中-高】
-* **减少 read/write 系统调用路径中的堆分配和内存拷贝** — 目前有额外开销（[Issue #1057](https://github.com/asterinas/asterinas/issues/1057)）【中】
+* ~~**零原子操作的文件表查找** — 消除文件描述符表查找中的原子操作开销（[Issue #1550](https://github.com/asterinas/asterinas/issues/1550)）【中-高】~~
+* ~~**减少 read/write 系统调用路径中的堆分配和内存拷贝** — 目前有额外开销（[Issue #1057](https://github.com/asterinas/asterinas/issues/1057)）【中】~~
 * **调查并修复 SMP=8 下 sqlite 性能退化** — 多核扩展性问题（[Issue #2485](https://github.com/asterinas/asterinas/issues/2485)）【中-高】
-* **用内联汇编替换 `read_volatile`/`write_volatile`** — 底层优化（[Issue #2948](https://github.com/asterinas/asterinas/issues/2948)）【低-中】
+* ~~**用内联汇编替换 `read_volatile`/`write_volatile`** — 底层优化（[Issue #2948](https://github.com/asterinas/asterinas/issues/2948)）【低-中】~~
 * **评估 PGO（Profile-Guided Optimization）对内核的效果** — 研究型任务（[Issue #760](https://github.com/asterinas/asterinas/issues/760)）【中】
 * **优化 XArray 的空节点清理** — 当前 cursor 操作不清理空内部节点（`kernel/libs/xarray/src/cursor.rs:470`）【低-中】
 * **优化 segment tree 实现** — 当前 range counter 用的是简单实现，TODO 建议用线段树（`ostd/src/util/range_counter.rs:5`）【中】
